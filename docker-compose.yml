@@ -9,7 +9,7 @@ services:
       context: ./todo-frontend
       dockerfile: Dockerfile
     ports:
-      - 80:80
+      - 8081:80
 
   api:
     container_name: todo-api
@@ -20,7 +20,7 @@ services:
       context: ./todo-backend
       dockerfile: todo-backend.API/Dockerfile
     ports:
-      - 8080:80
+      - 8082:80
       
   db:
     image: postgres:15
@@ -31,7 +31,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - '5432:5432'
+      - '5442:5432'
     volumes:
       - db-data:/var/lib/postgresql/data
 
