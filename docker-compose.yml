@@ -9,7 +9,7 @@ services:
       context: ./todo-frontend
       dockerfile: Dockerfile
     ports:
-      - 8081:80
+      - 8181:80
 
   api:
     container_name: todo-api
@@ -20,7 +20,7 @@ services:
       context: ./todo-backend
       dockerfile: todo-backend.API/Dockerfile
     ports:
-      - 8082:80
+      - 8182:80
       
   db:
     image: postgres:15
