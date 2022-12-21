@@ -1,0 +1,40 @@
+version: '3'
+services:
+  frontend:
+    container_name: todo-frontend
+    image: todo-frontend
+    depends_on:
+      - api
+    build:
+      context: ./todo-frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+
+  api:
+    container_name: todo-api
+    image: todo-api
+    depends_on:
+      - db
+    build:
+      context: ./todo-backend
+      dockerfile: todo-backend.API/Dockerfile
+    ports:
+      - 8080:80
+      
+  db:
+    image: postgres:15
+    container_name: todo-db
+    restart: always
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+    driver: local
