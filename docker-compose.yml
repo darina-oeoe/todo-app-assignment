@@ -1,29 +1,6 @@
-version: '3'
 services:
-  frontend:
-    container_name: todo-frontend
-    image: todo-frontend
-    depends_on:
-      - api
-    build:
-      context: ./todo-frontend
-      dockerfile: Dockerfile
-    ports:
-      - 8181:80
-
-  api:
-    container_name: todo-api
-    image: todo-api
-    depends_on:
-      - db
-    build:
-      context: ./todo-backend
-      dockerfile: todo-backend.API/Dockerfile
-    ports:
-      - 8182:80
-      
   db:
-    image: postgres:15
+    image: postgres:16
     container_name: todo-db
     restart: always
     environment:
@@ -31,10 +8,43 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - '5442:5432'
+      - "5442:5432"           # host:container
     volumes:
       - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    container_name: todo-api
+    build:
+      context: ./todo-backend
+      dockerfile: todo-backend.API/Dockerfile
+    image: todo-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:80
+      # This overrides appsettings.json → ConnectionStrings:Default
+      ConnectionStrings__Default: Host=db;Port=5432;Database=db;Username=postgres;Password=postgres
+    ports:
+      - "8182:80"             # visit http://localhost:8182 (Swagger after you add it)
+
+  frontend:
+    container_name: todo-frontend
+    build:
+      context: ./todo-frontend
+      dockerfile: Dockerfile
+    image: todo-frontend
+    depends_on:
+      - api
+    ports:
+      - "8181:80"             # visit http://localhost:8181
 
 volumes:
   db-data:
     driver: local
+
