@@ -1,5 +1,12 @@
 # Test Assignment – Todo App (React + ASP.NET Core + PostgreSQL)
 
+### Quick usage
+
+1. Open **http://localhost:8181**
+2. Use **Search & filters** (top card) to narrow results  
+3. Use **Add new todo** (middle card) to create items (optional due date)  
+4. Click **Show subtasks** on any row to view/add nested todos
+
 ## Thought process and reasoning
 
 **Why these technologies**  
@@ -54,8 +61,12 @@ docker compose down -v       # stop + remove volumes (fresh DB)
 **Base URL:** `http://localhost:8182/api`
 
 ### Endpoints
-- `GET /todos?pageSize=20&cursor=<token>&q=<text>&done=true|false&dueBefore=&dueAfter=&dueOn=&parentId=`  
-  Returns `{ "items": [ ... ], "nextCursor": "..." }`
+- `GET /todos`
+  - Query params (all optional):  
+    `pageSize`, `cursor`, `q`, `done`, `dueAfter`, `dueBefore`, `dueOn`, `parentId`  
+  - Returns: `{ "items": [...], "nextCursor": "..." }`
+  - Notes:
+    - `parentId=null` → root todos; set `parentId=<guid>` to list subtasks of a todo
 - `POST /todos`
   ```json
   { "description": "first task", "dueDate": null, "parentId": null }
@@ -92,6 +103,17 @@ npm start     # http://localhost:3000
 Ensure API is running (Docker) and CORS allows `http://localhost:3000`.
 
 **Dockerized FE:** served via Nginx at `http://localhost:8181` (configured in `docker-compose.yml`).
+
+## Features
+
+- Create, update (done), and delete todos
+- Assign **due dates** to todos
+- **Filter** by:
+  - Text search (fast `%…%` search via pg_trgm)
+  - Done / Not done / All
+  - **Due after** and **Due before**
+- **Subtasks (infinite nesting)**: add todos under todos, expand/collapse branches
+- Infinite scroll (cursor pagination) for long lists
 
 ---
 
